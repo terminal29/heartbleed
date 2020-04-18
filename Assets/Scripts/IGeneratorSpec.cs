@@ -3,7 +3,7 @@ using System.Collections;
 
 public interface IGeneratorSpec
 {
-    WorldTile GenerateTileAt(int seed, Vector2Int position);
+    IWorldTile GenerateTileAt(int seed, Vector2Int position);
 
     Vector2Int GetSpawn();
 }

@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour
             audioSource.PlayOneShot(JumpSounds[r.Next(0, JumpSounds.Length)]);
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && isOnGround)
+        if (Input.GetKeyDown(KeyCode.UpArrow) && isOnGround)
         {
             Jump();
         }

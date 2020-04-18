@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class GroundGenerator : MonoBehaviour, WorldGenerator
 {
-    public WorldTile dirt;
-    public WorldTile stone;
+    public IWorldTile dirt;
+    public IWorldTile stone;
+    public IWorldTile moveStone;
+    public IWorldTile jumpStone;
+
     public PlayerController player;
 
     private IGeneratorSpec generatorSpec;
@@ -15,7 +18,7 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
     const int height = 256;
 
     bool hasGenerated = false;
-    private Dictionary<Vector2Int, WorldTile> tiles = new Dictionary<Vector2Int, WorldTile>();
+    private Dictionary<Vector2Int, IWorldTile> tiles = new Dictionary<Vector2Int, IWorldTile>();
 
     void Start()
     {
@@ -23,7 +26,17 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
            new Rect(16, height-32, 32, 32),
            new Rect(15, height-31, 34, 32),
            new Rect(14, height-30, 36, 32)
-        }, new Vector2Int(18, height - 29));
+        }, new Vector2Int(18, height - 29), new List<HoleGroundGenerator.CustomGenerator>
+        {
+            (seed, position) =>
+            {
+                if((position.x == 17 || position.x == 18) && (position.y == height-32 || position.y == height - 31))
+                {
+                    return moveStone;
+                }
+                return null;
+            }
+        });
         Generate(0);
         player.Spawn(generatorSpec.GetSpawn());
     }
@@ -79,19 +92,19 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
         }
     }
 
-    public WorldTile GetTileAt(Vector2Int pos)
+    public IWorldTile GetTileAt(Vector2Int pos)
     {
         if (tiles.ContainsKey(pos))
             return tiles[pos];
         return null;
     }
 
-    public Dictionary<Vector2Int, WorldTile> GetWorldTiles()
+    public Dictionary<Vector2Int, IWorldTile> GetWorldTiles()
     {
         return tiles;
     }
 
-    public void SetTileAt(WorldTile tile, Vector2Int position)
+    public void SetTileAt(IWorldTile tile, Vector2Int position)
     {
         if (tiles.ContainsKey(position))
             DestroyTileAt(position);
@@ -110,7 +123,7 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
         {
             DestroyTileAt(position);
         }
-        WorldTile prefab = generatorSpec.GenerateTileAt(0, position);
+        IWorldTile prefab = generatorSpec.GenerateTileAt(0, position);
         if (prefab)
             tiles[position] = Instantiate(prefab, GetRealPositionFor(position), Quaternion.identity, transform);
     }

@@ -23,7 +23,7 @@ public interface WorldGenerator
     /// Gets all of the world tiles
     /// </summary>
     /// <returns></returns>
-    Dictionary<Vector2Int, WorldTile> GetWorldTiles();
+    Dictionary<Vector2Int, IWorldTile> GetWorldTiles();
 
     /// <summary>
     /// Generates a tile at that position using the internal generator, removing any previous tile that was there
@@ -45,12 +45,12 @@ public interface WorldGenerator
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <returns></returns>
-    WorldTile GetTileAt(Vector2Int position);
+    IWorldTile GetTileAt(Vector2Int position);
 
     /// <summary>
     /// Sets the tile at a specific index
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
-    void SetTileAt(WorldTile tile, Vector2Int position);
+    void SetTileAt(IWorldTile tile, Vector2Int position);
 }

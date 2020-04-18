@@ -152,6 +152,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dirt: {fileID: 3081662675628670411, guid: 0151f5c4e1c69584fa64d28125b1274f, type: 3}
   stone: {fileID: 4412965425503642968, guid: cf667cf27a9477d49a4b5dbe33d70e63, type: 3}
+  moveStone: {fileID: 2602449652928654585, guid: fd56282d5ce7cba46bcf26c24f947cb6,
+    type: 3}
+  jumpStone: {fileID: 8345916947266641898, guid: d04c95847617a874a88c7217c1470716,
+    type: 3}
   player: {fileID: 1111597091}
   tileSize: 1
 --- !u!4 &515628192
@@ -283,6 +287,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18c2b16a3357a8b46934057e66207812, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!167 &1111597095
+AudioReverbZone:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1111597088}
+  m_Enabled: 1
+  m_MinDistance: 10
+  m_MaxDistance: 15
+  m_ReverbPreset: 9
+  m_Room: -1000
+  m_RoomHF: 0
+  m_DecayTime: 2.91
+  m_DecayHFRatio: 1.3
+  m_Reflections: -602
+  m_ReflectionsDelay: 0.015
+  m_Reverb: -302
+  m_ReverbDelay: 0.022
+  m_HFReference: 5000
+  m_Diffusion: 100
+  m_Density: 100
+  m_LFReference: 250
+  m_RoomLF: 0
 --- !u!1001 &1685965732
 PrefabInstance:
   m_ObjectHideFlags: 0
