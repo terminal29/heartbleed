@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4412965425503642970}
   - component: {fileID: 4412965425503642969}
   - component: {fileID: 4412965425503642968}
+  - component: {fileID: 8365604914816304441}
   m_Layer: 0
   m_Name: StoneTile
   m_TagString: Untagged
@@ -71,15 +72,15 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 33c6405eea2f72042ada923e4d85f635, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.16, y: 0.16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &4412965425503642968
@@ -98,3 +99,29 @@ MonoBehaviour:
   OuterCorner: {fileID: 21300000, guid: 8581142edab074845922e870a3ee0915, type: 3}
   InnerCorner: {fileID: 21300000, guid: f3af7dcb8aba33a4cb7135252fb49017, type: 3}
   Edge: {fileID: 21300000, guid: c1520a1aaf6e240488ac770d2a6acf49, type: 3}
+--- !u!61 &8365604914816304441
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4412965425503642975}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.16, y: 0.16}
+    newSize: {x: 0.16, y: 0.16}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.16, y: 0.16}
+  m_EdgeRadius: 0
