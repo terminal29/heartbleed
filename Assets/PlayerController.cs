@@ -1,8 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(CapsuleCollider2D))]
+[RequireComponent(typeof(AudioSource))]
 public class PlayerController : MonoBehaviour
 {
     public Sprite[] IdleSprites;
@@ -10,7 +14,13 @@ public class PlayerController : MonoBehaviour
     public Sprite[] JumpSprites;
     public Sprite[] FallSprites;
 
+    public AudioClip[] StepSounds;
+    public AudioClip[] JumpSounds;
+    public AudioClip[] StompSounds;
+
     private int currentSpriteIndex = 0;
+    private System.Random r = new System.Random();
+    private bool wasOnGround = true;
 
     private Sprite[] currentSpriteList;
     public enum State
@@ -35,6 +45,7 @@ public class PlayerController : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private Rigidbody2D body;
     private CapsuleCollider2D capCollider;
+    private AudioSource audioSource;
     Coroutine animator;
 
     // Start is called before the first frame update
@@ -43,6 +54,7 @@ public class PlayerController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         body = GetComponent<Rigidbody2D>();
         capCollider = GetComponent<CapsuleCollider2D>();
+        audioSource = GetComponent<AudioSource>();
         SetState(State.Idle, Direction.Left);
     }
 
@@ -50,6 +62,14 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         bool isOnGround = IsOnGround();
+        if (isOnGround && !wasOnGround)
+        {
+            audioSource.PlayOneShot(StompSounds[r.Next(0, StompSounds.Length)]);
+        }
+        if (!isOnGround && wasOnGround)
+        {
+            audioSource.PlayOneShot(JumpSounds[r.Next(0, JumpSounds.Length)]);
+        }
 
         if (Input.GetKeyDown(KeyCode.Space) && isOnGround)
         {
@@ -92,6 +112,7 @@ public class PlayerController : MonoBehaviour
                 SetState(state, Direction.Right);
             }
         }
+        wasOnGround = isOnGround;
     }
 
     public void Spawn(Vector2 pos)
@@ -101,7 +122,16 @@ public class PlayerController : MonoBehaviour
 
     private bool IsOnGround()
     {
-        RaycastHit2D ray = Physics2D.BoxCast(capCollider.bounds.center, capCollider.bounds.size, 0f, Vector2.down, 0.1f, groundCollisionMask);
+        RaycastHit2D ray = Physics2D.BoxCast(capCollider.bounds.center, capCollider.bounds.size - new Vector3(0.1f, 0, 0), 0f, Vector2.down, 0.1f, groundCollisionMask);
+        Color r = Color.red;
+        if (ray.collider != null)
+            r = Color.blue;
+
+        Debug.DrawRay(capCollider.bounds.center + new Vector3(capCollider.bounds.extents.x - 0.1f, 0), Vector2.down * (capCollider.bounds.extents.y + 0.1f), r);
+        Debug.DrawRay(capCollider.bounds.center - new Vector3(capCollider.bounds.extents.x - 0.1f, 0), Vector2.down * (capCollider.bounds.extents.y + 0.1f), r);
+
+
+
         return ray.collider != null;
     }
 
@@ -172,12 +202,21 @@ public class PlayerController : MonoBehaviour
         spriteRenderer.sprite = currentSpriteList[currentSpriteIndex];
     }
 
+    private void PlaySoundForAnimation()
+    {
+        if (state == State.Walk && currentSpriteIndex % 2 == 0)
+        {
+            audioSource.PlayOneShot(StepSounds[r.Next(0, StepSounds.Length)]);
+        }
+    }
+
     private IEnumerator RunFrameAnimation()
     {
         while (true)
         {
             NextAnimatorIndex();
-            yield return new WaitForSeconds(0.3f);
+            PlaySoundForAnimation();
+            yield return new WaitForSeconds(0.1f);
         }
     }
 }
