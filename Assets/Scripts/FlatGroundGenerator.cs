@@ -3,13 +3,15 @@ using System.Collections.Generic;
 
 public class HoleGroundGenerator : IGeneratorSpec
 {
-    public WorldTile groundTile;
-
+    WorldTile groundTile;
     List<Rect> holes;
-    public HoleGroundGenerator(WorldTile groundTile, List<Rect> holes)
+    Vector2Int spawnPoint;
+
+    public HoleGroundGenerator(WorldTile groundTile, List<Rect> holes, Vector2Int spawnPoint)
     {
         this.groundTile = groundTile;
         this.holes = holes;
+        this.spawnPoint = spawnPoint;
     }
 
     public WorldTile GenerateTileAt(int seed, Vector2Int position)
@@ -23,5 +25,10 @@ public class HoleGroundGenerator : IGeneratorSpec
             }
         }
         return groundTile;
+    }
+
+    public Vector2Int GetSpawn()
+    {
+        return spawnPoint;
     }
 }

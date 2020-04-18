@@ -6,6 +6,7 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
 {
     public WorldTile dirt;
     public WorldTile stone;
+    public PlayerController player;
 
     private IGeneratorSpec generatorSpec;
 
@@ -22,8 +23,9 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
            new Rect(16, height-32, 32, 32),
            new Rect(15, height-31, 34, 32),
            new Rect(14, height-30, 36, 32)
-        });
+        }, new Vector2Int(18, height - 29));
         Generate(0);
+        player.Spawn(generatorSpec.GetSpawn());
     }
 
     private void OnDestroy()

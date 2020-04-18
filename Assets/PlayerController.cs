@@ -81,7 +81,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (body.velocity.magnitude > 0.1)
+        if (Mathf.Abs(body.velocity.x) > 0.1)
         {
             if (body.velocity.x < 0)
             {
@@ -92,6 +92,11 @@ public class PlayerController : MonoBehaviour
                 SetState(state, Direction.Right);
             }
         }
+    }
+
+    public void Spawn(Vector2 pos)
+    {
+        transform.position = pos;
     }
 
     private bool IsOnGround()
