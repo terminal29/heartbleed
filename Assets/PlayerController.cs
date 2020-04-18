@@ -17,12 +17,16 @@ public class PlayerController : MonoBehaviour
     public AudioClip[] StepSounds;
     public AudioClip[] JumpSounds;
     public AudioClip[] StompSounds;
+    public AudioClip BeatSound;
+
+    public HeartController heart;
 
     private int currentSpriteIndex = 0;
     private System.Random r = new System.Random();
     private bool wasOnGround = true;
 
     private Sprite[] currentSpriteList;
+
     public enum State
     {
         Idle,
@@ -30,9 +34,11 @@ public class PlayerController : MonoBehaviour
         Jump,
         Fall
     }
+
     public enum Direction
     {
-        Left, Right
+        Left,
+        Right
     }
 
     private State state;
@@ -55,6 +61,10 @@ public class PlayerController : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
         capCollider = GetComponent<CapsuleCollider2D>();
         audioSource = GetComponent<AudioSource>();
+        heart.onHeartbeat = () =>
+        {
+            audioSource.PlayOneShot(BeatSound);
+        };
         SetState(State.Idle, Direction.Left);
     }
 
@@ -129,9 +139,6 @@ public class PlayerController : MonoBehaviour
 
         Debug.DrawRay(capCollider.bounds.center + new Vector3(capCollider.bounds.extents.x - 0.1f, 0), Vector2.down * (capCollider.bounds.extents.y + 0.1f), r);
         Debug.DrawRay(capCollider.bounds.center - new Vector3(capCollider.bounds.extents.x - 0.1f, 0), Vector2.down * (capCollider.bounds.extents.y + 0.1f), r);
-
-
-
         return ray.collider != null;
     }
 

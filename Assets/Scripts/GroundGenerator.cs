@@ -8,6 +8,7 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
     public IWorldTile stone;
     public IWorldTile moveStone;
     public IWorldTile jumpStone;
+    public IWorldTile lava;
 
     public PlayerController player;
 
@@ -25,15 +26,30 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
         generatorSpec = new HoleGroundGenerator(stone, new List<Rect>{
            new Rect(16, height-32, 32, 32),
            new Rect(15, height-31, 34, 32),
-           new Rect(14, height-30, 36, 32)
+           new Rect(14, height-30, 36, 32),
+           new Rect(14, height-30, 36, 32),
+           new Rect(31, height-35, 10, 3)
         }, new Vector2Int(18, height - 29), new List<HoleGroundGenerator.CustomGenerator>
         {
             (seed, position) =>
             {
-                if((position.x == 17 || position.x == 18) && (position.y == height-32 || position.y == height - 31))
+                if(new Rect(31, height-35, 10, 3).Contains(position))
+                {
+                    return lava;
+                }
+                if((position.x == 17 || position.x == 18) && (position.y == height - 32 || position.y == height - 31))
                 {
                     return moveStone;
                 }
+                if((position.x == 22 || position.x == 23) && (position.y == height - 32 || position.y == height - 31))
+                {
+                    return jumpStone;
+                }
+                if((position.x >= 29 && position.x <= 30) && (position.y >= (height - 32) && position.y <= (height - 31)))
+                {
+                    return stone;
+                }
+
                 return null;
             }
         });

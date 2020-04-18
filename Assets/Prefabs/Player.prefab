@@ -124,8 +124,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: a2a1eb3f23a953a4d97cbb4a892df987, type: 3}
   StompSounds:
   - {fileID: 8300000, guid: 9ab55a8b1cf00d64cadc99a8629e80d3, type: 3}
+  heart: {fileID: 0}
   moveSpeed: 10
-  jumpPower: 8.5
+  jumpPower: 10
   groundCollisionMask:
     serializedVersion: 2
     m_Bits: 55
