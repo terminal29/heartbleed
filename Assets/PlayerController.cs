@@ -17,13 +17,19 @@ public class PlayerController : MonoBehaviour
     public AudioClip[] StepSounds;
     public AudioClip[] JumpSounds;
     public AudioClip[] StompSounds;
+
     public AudioClip BeatSound;
+    public AudioClip DeathSound;
+    public AudioClip RespawnSound;
 
     public HeartController heart;
+    public WorldGenerator world;
 
     private int currentSpriteIndex = 0;
     private System.Random r = new System.Random();
     private bool wasOnGround = true;
+
+    public bool isAlive = false;
 
     private Sprite[] currentSpriteList;
 
@@ -71,6 +77,8 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!isAlive)
+            return;
         bool isOnGround = IsOnGround();
         if (isOnGround && !wasOnGround)
         {
@@ -127,6 +135,7 @@ public class PlayerController : MonoBehaviour
 
     public void Spawn(Vector2 pos)
     {
+        isAlive = true;
         transform.position = pos;
     }
 
@@ -199,6 +208,15 @@ public class PlayerController : MonoBehaviour
         animator = StartCoroutine(RunFrameAnimation());
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.GetComponent<LavaTile>() != null)
+        {
+            if (isAlive)
+                Die();
+        }
+    }
+
     private void NextAnimatorIndex()
     {
         currentSpriteIndex++;
@@ -221,9 +239,33 @@ public class PlayerController : MonoBehaviour
     {
         while (true)
         {
-            NextAnimatorIndex();
-            PlaySoundForAnimation();
+            if (isAlive)
+            {
+                NextAnimatorIndex();
+                PlaySoundForAnimation();
+            }
             yield return new WaitForSeconds(0.1f);
         }
+    }
+
+    private void Die()
+    {
+        isAlive = false;
+        StartCoroutine(RunDeathAnimation());
+    }
+
+    private IEnumerator RunDeathAnimation()
+    {
+        audioSource.PlayOneShot(DeathSound);
+        heart.SetHealth(heart.GetHealth() - 1);
+        yield return new WaitForSeconds(3f);
+        yield return RunRespawnAnimation();
+    }
+
+    private IEnumerator RunRespawnAnimation()
+    {
+        audioSource.PlayOneShot(RespawnSound);
+        yield return new WaitForSeconds(3f);
+        Spawn(world.GetSpawnPoint());
     }
 }

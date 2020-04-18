@@ -19,6 +19,8 @@ public interface WorldGenerator
     /// <returns></returns>
     Vector2Int GetWorldSize();
 
+    Vector2Int GetSpawnPoint();
+
     /// <summary>
     /// Gets all of the world tiles
     /// </summary>

@@ -23,6 +23,7 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
 
     void Start()
     {
+        player.world = this;
         generatorSpec = new HoleGroundGenerator(stone, new List<Rect>{
            new Rect(16, height-32, 32, 32),
            new Rect(15, height-31, 34, 32),
@@ -60,6 +61,11 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
     private void OnDestroy()
     {
         Clear();
+    }
+
+    public Vector2Int GetSpawnPoint()
+    {
+        return generatorSpec.GetSpawn();
     }
 
     public Vector2 GetRealPositionFor(Vector2Int pos)

@@ -577,6 +577,16 @@ PrefabInstance:
       propertyPath: BeatSound
       value: 
       objectReference: {fileID: 8300000, guid: ebee5062b24304744a03098116df9013, type: 3}
+    - target: {fileID: 4072567198512048212, guid: c0c9091e19dadaa4eae3807a2ff0eeda,
+        type: 3}
+      propertyPath: DeathSound
+      value: 
+      objectReference: {fileID: 8300000, guid: fe1e750143286f0459339f583b3ef767, type: 3}
+    - target: {fileID: 4072567198512048212, guid: c0c9091e19dadaa4eae3807a2ff0eeda,
+        type: 3}
+      propertyPath: RespawnSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 71f1a057dd780004db0b2df185f1d5aa, type: 3}
     - target: {fileID: 4072567198512048215, guid: c0c9091e19dadaa4eae3807a2ff0eeda,
         type: 3}
       propertyPath: m_Name

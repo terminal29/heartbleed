@@ -21,9 +21,12 @@ public class HeartController : MonoBehaviour
     private float scaleX = 1;
     private float scaleY = 1;
 
+    private float beatInterval = 0.2f;
+
     public void SetHealth(int health)
     {
         this.health = health;
+        beatInterval = (((health) / (float)maxHealth)) * 0.2f;
     }
 
     public int GetMaxHealth()
@@ -61,15 +64,15 @@ public class HeartController : MonoBehaviour
         {
             scaleX = 1f;
             scaleY = 1f;
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(beatInterval * 5);
             onHeartbeat?.Invoke();
             scaleX = 1.2f;
             scaleY = 0.1f;
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(beatInterval);
             onHeartbeat?.Invoke();
             scaleY = 1.2f;
             scaleX = 0.1f;
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(beatInterval);
         }
     }
 
