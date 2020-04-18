@@ -5,20 +5,30 @@ using UnityEngine;
 public class GroundGenerator : MonoBehaviour, WorldGenerator
 {
     public WorldTile dirt;
+    public WorldTile stone;
 
     private IGeneratorSpec generatorSpec;
 
     public float tileSize = 1f;
-    const int width = 32;
-    const int height = 32;
+    const int width = 64;
+    const int height = 256;
 
     bool hasGenerated = false;
     private Dictionary<Vector2Int, WorldTile> tiles = new Dictionary<Vector2Int, WorldTile>();
 
     void Start()
     {
-        generatorSpec = new FlatGroundGenerator(dirt);
+        generatorSpec = new HoleGroundGenerator(stone, new List<Rect>{
+           new Rect(16, height-32, 32, 32),
+           new Rect(15, height-31, 34, 32),
+           new Rect(14, height-30, 36, 32)
+        });
         Generate(0);
+    }
+
+    private void OnDestroy()
+    {
+        Clear();
     }
 
     public Vector2 GetRealPositionFor(Vector2Int pos)
@@ -26,20 +36,25 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
         return new Vector3(pos.x * tileSize, pos.y * tileSize, 0);
     }
 
+    public void Clear()
+    {
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                DestroyTileAt(new Vector2Int(x, y));
+            }
+        }
+        // Clear the dict
+        tiles.Clear();
+    }
+
     public void Generate(int seed)
     {
         if (hasGenerated)
         {
             // Clear old gameobjects (if they exist)
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    DestroyTileAt(new Vector2Int(x, y));
-                }
-            }
-            // Clear the dict
-            tiles.Clear();
+            Clear();
         }
 
         // Generate new ones

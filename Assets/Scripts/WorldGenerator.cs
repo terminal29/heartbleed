@@ -9,6 +9,11 @@ public interface WorldGenerator
     void Generate(int seed);
 
     /// <summary>
+    /// Un-Generates
+    /// </summary>
+    void Clear();
+
+    /// <summary>
     /// Gets the size of the world
     /// </summary>
     /// <returns></returns>

@@ -1,24 +1,27 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
-public class FlatGroundGenerator : IGeneratorSpec
+public class HoleGroundGenerator : IGeneratorSpec
 {
-    public WorldTile dirtTile;
+    public WorldTile groundTile;
 
-    public FlatGroundGenerator(WorldTile dirt)
+    List<Rect> holes;
+    public HoleGroundGenerator(WorldTile groundTile, List<Rect> holes)
     {
-        dirtTile = dirt;
+        this.groundTile = groundTile;
+        this.holes = holes;
     }
 
     public WorldTile GenerateTileAt(int seed, Vector2Int position)
     {
-        if (!(position.y > 5 && position.y < 10 && position.x > 5 && position.x < 10))
+
+        foreach (Rect hole in holes)
         {
-            return dirtTile;
+            if (hole.Contains(position))
+            {
+                return null;
+            }
         }
-        else
-        {
-            return null;
-        }
+        return groundTile;
     }
 }
