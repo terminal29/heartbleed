@@ -11,13 +11,14 @@ public class Perk : MonoBehaviour
     public Image perkImage;
     public void SetEnabled(bool enabled)
     {
-        if (enabled)
+        if (enabled && perkImage.material != onMaterial)
         {
             perkImage.material = onMaterial;
         }
         else
         {
-            perkImage.material = offMaterial;
+            if (perkImage.material != offMaterial)
+                perkImage.material = offMaterial;
         }
     }
     // Start is called before the first frame update

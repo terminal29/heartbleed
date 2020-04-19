@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering.Universal;
 
 [RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(Rigidbody2D))]
@@ -26,6 +27,8 @@ public class PlayerController : MonoBehaviour
     public AudioClip bulletShootSound;
     public AudioClip reloadSound;
     public AudioClip bulletHitSound;
+
+    public Light2D gunLight;
 
     private GameManager gameManager;
 
@@ -100,6 +103,9 @@ public class PlayerController : MonoBehaviour
     {
         if (!isAlive)
             return;
+        shootCooldownSeconds = gameManager.GetPerks()[GameManager.PerkType.QuickReload] ? 0.2f : 1f;
+        gunLight.intensity = gameManager.GetPerks()[GameManager.PerkType.BigLight] ? 5 : 1;
+        gunLight.pointLightOuterRadius = gameManager.GetPerks()[GameManager.PerkType.BigLight] ? 5 : 1;
         bool isOnGround = IsOnGround();
         if (isOnGround && !wasOnGround)
         {
@@ -169,13 +175,44 @@ public class PlayerController : MonoBehaviour
             BulletController bulletInstance = Instantiate(bullet);
             double bulletXVelocity = (bulletInitialVelocity.x + bulletRandomSpread * ((2 * r.NextDouble() - 1) / 2));
             bulletXVelocity = direction == Direction.Left ? -bulletXVelocity : bulletXVelocity;
+
             double bulletYVelocity = (bulletInitialVelocity.y + bulletRandomSpread * ((2 * r.NextDouble() - 1) / 2));
+
+            if (gameManager.GetPerks()[GameManager.PerkType.DirectFire])
+            {
+                bulletYVelocity = 0;
+                bulletXVelocity *= 2;
+            }
+
             bulletInstance.transform.position = transform.position + new Vector3(direction == Direction.Left ? -0.8f : 0.8f, 0.2f, 0);
             bulletInstance.GetComponent<Rigidbody2D>().velocity = new Vector2((float)bulletXVelocity, (float)bulletYVelocity) + body.velocity;
             bulletInstance.onBulletHit = () =>
             {
                 bulletInstance.GetComponent<AudioSource>().PlayOneShot(bulletHitSound);
             };
+
+            if (gameManager.GetPerks()[GameManager.PerkType.DoubleFire])
+            {
+                bulletInstance = Instantiate(bullet);
+                bulletXVelocity = (bulletInitialVelocity.x + bulletRandomSpread * ((2 * r.NextDouble() - 1) / 2));
+                bulletXVelocity = direction == Direction.Left ? -bulletXVelocity : bulletXVelocity;
+
+                bulletYVelocity = (bulletInitialVelocity.y + bulletRandomSpread * ((2 * r.NextDouble() - 1) / 2));
+
+                if (gameManager.GetPerks()[GameManager.PerkType.DirectFire])
+                {
+                    bulletYVelocity = 0;
+                    bulletXVelocity *= 2;
+                }
+
+                bulletInstance.transform.position = transform.position - new Vector3(direction == Direction.Left ? -0.8f : 0.8f, 0.2f, 0);
+                bulletInstance.GetComponent<Rigidbody2D>().velocity = new Vector2(-(float)bulletXVelocity, (float)bulletYVelocity) + body.velocity;
+                bulletInstance.onBulletHit = () =>
+                {
+                    bulletInstance.GetComponent<AudioSource>().PlayOneShot(bulletHitSound);
+                };
+            }
+
             audioSource.PlayOneShot(bulletShootSound);
             StartCoroutine(RunShootCooldown());
         }
@@ -183,6 +220,7 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator RunShootCooldown()
     {
+
         yield return new WaitForSeconds(shootCooldownSeconds);
         audioSource.PlayOneShot(reloadSound);
         this.canShoot = true;

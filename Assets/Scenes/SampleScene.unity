@@ -530,9 +530,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   biggerLight: {fileID: 709147785}
-  directFire: {fileID: 0}
+  directFire: {fileID: 634970482}
   quickReload: {fileID: 934169948397163887}
-  doubleFire: {fileID: 0}
+  doubleFire: {fileID: 1467544510815365396}
 --- !u!1 &619560754
 GameObject:
   m_ObjectHideFlags: 0

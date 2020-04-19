@@ -111,12 +111,13 @@ public class GameManager : MonoBehaviour
     }
 
 
-    private Dictionary<PerkType, bool> enabledPerks = new Dictionary<PerkType, bool>{
-        {PerkType.BigLight, true },
-        {PerkType.QuickReload, false },
+    public Dictionary<PerkType, bool> enabledPerks = new Dictionary<PerkType, bool>{
+        {PerkType.BigLight, false },
+        {PerkType.QuickReload, true },
         {PerkType.DoubleFire, true },
-        {PerkType.DirectFire, false }
+        {PerkType.DirectFire, true }
         };
+
     public enum PerkType
     {
         BigLight,
@@ -142,6 +143,10 @@ public class GameManager : MonoBehaviour
 
     public void PlayerDied()
     {
+        SetPerkStatus(PerkType.BigLight, false);
+        SetPerkStatus(PerkType.DirectFire, false);
+        SetPerkStatus(PerkType.DoubleFire, false);
+        SetPerkStatus(PerkType.QuickReload, false);
         if (heart.GetHealth() > 0)
         {
             respawnUI.Hide();
