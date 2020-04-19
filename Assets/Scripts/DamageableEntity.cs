@@ -4,19 +4,10 @@ using UnityEngine;
 
 public class DamageableEntity : MonoBehaviour
 {
+    public delegate void OnDamage(int amount);
+    public OnDamage onDamage;
     public void Damage(int amount)
     {
-        Debug.Log(string.Format("Damage {0}", amount));
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        onDamage?.Invoke(amount);
     }
 }

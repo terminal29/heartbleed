@@ -24,6 +24,9 @@ public class GameManager : MonoBehaviour
     [Header("UI")]
     public RespawnUI respawnUI;
 
+    [Header("Loot")]
+    public GameObject coinLoot;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -39,6 +42,11 @@ public class GameManager : MonoBehaviour
     void Update()
     {
 
+    }
+
+    public GameObject GetCoinPrefab()
+    {
+        return coinLoot;
     }
 
 
@@ -137,5 +145,10 @@ public class GameManager : MonoBehaviour
     public IGeneratorSpec GetGeneratorSpec()
     {
         return generatorSpec;
+    }
+
+    public float GetLootMultiplier()
+    {
+        return 1f;
     }
 }

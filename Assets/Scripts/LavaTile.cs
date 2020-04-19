@@ -153,4 +153,9 @@ public class LavaTile : IWorldTile
         spriteType = type;
         UpdateRenderer();
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        collision.gameObject.GetComponent<DamageableEntity>()?.Damage(1);
+    }
 }

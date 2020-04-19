@@ -7,6 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(CapsuleCollider2D))]
 [RequireComponent(typeof(AudioSource))]
+[RequireComponent(typeof(DamageableEntity))]
 public class PlayerController : MonoBehaviour
 {
     public Sprite[] IdleSprites;
@@ -30,13 +31,13 @@ public class PlayerController : MonoBehaviour
 
     public BulletController bullet;
 
-    private int currentSpriteIndex = 0;
     private System.Random r = new System.Random();
     private bool wasOnGround = true;
 
     public bool isAlive = false;
 
     private Sprite[] currentSpriteList;
+    private int currentSpriteIndex = 0;
 
     public enum State
     {
@@ -77,6 +78,10 @@ public class PlayerController : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
         capCollider = GetComponent<CapsuleCollider2D>();
         audioSource = GetComponent<AudioSource>();
+        GetComponent<DamageableEntity>().onDamage = (amount) =>
+        {
+            Die();
+        };
         SetState(State.Idle, Direction.Left);
     }
 
@@ -168,7 +173,7 @@ public class PlayerController : MonoBehaviour
             bulletInstance.GetComponent<Rigidbody2D>().velocity = new Vector2((float)bulletXVelocity, (float)bulletYVelocity) + body.velocity;
             bulletInstance.onBulletHit = () =>
             {
-                audioSource.PlayOneShot(bulletHitSound);
+                bulletInstance.GetComponent<AudioSource>().PlayOneShot(bulletHitSound);
             };
             audioSource.PlayOneShot(bulletShootSound);
             StartCoroutine(RunShootCooldown());
@@ -178,7 +183,7 @@ public class PlayerController : MonoBehaviour
     private IEnumerator RunShootCooldown()
     {
         yield return new WaitForSeconds(shootCooldownSeconds);
-        audioSource.PlayOneShot(bulletShootSound);
+        audioSource.PlayOneShot(reloadSound);
         this.canShoot = true;
     }
 
@@ -256,15 +261,6 @@ public class PlayerController : MonoBehaviour
         animator = StartCoroutine(RunFrameAnimation());
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.collider.GetComponent<LavaTile>() != null)
-        {
-            if (isAlive)
-                Die();
-        }
-    }
-
     private void NextAnimatorIndex()
     {
         currentSpriteIndex++;
@@ -322,5 +318,10 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(2.2f);
         SetAlive(true);
         SetState(State.Idle, Direction.Left);
+    }
+
+    public void Damage(int amount)
+    {
+        Die();
     }
 }
