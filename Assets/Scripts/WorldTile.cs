@@ -5,13 +5,14 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer))]
 public class WorldTile : IWorldTile
 {
-    public Sprite Center, OuterCorner, InnerCorner, Edge;
+    public Sprite Center, OuterCorner, InnerCorner, Edge, EdgeBg;
     public enum SpriteVariant
     {
         Center,
         OuterCorner,
         InnerCorner,
-        Edge
+        Edge,
+        EdgeBg
     }
 
     SpriteRenderer spriteRenderer;
@@ -35,6 +36,9 @@ public class WorldTile : IWorldTile
                 case SpriteVariant.OuterCorner:
                     spriteRenderer.sprite = OuterCorner;
                     break;
+                case SpriteVariant.EdgeBg:
+                    spriteRenderer.sprite = EdgeBg;
+                    break;
                 default:
                     spriteRenderer.sprite = null;
                     break;
@@ -52,26 +56,37 @@ public class WorldTile : IWorldTile
         UpdateRenderer();
     }
 
-    public override bool DoesCollide()
+    public override bool DoesConnect()
     {
         return true;
     }
 
-    protected IWorldTile DoesCollideOrNull(IWorldTile tile)
+    protected IWorldTile DoesConnectOrNull(IWorldTile tile)
     {
-        return tile ? (tile.DoesCollide() ? tile : null) : null;
+        return tile ? (tile.DoesConnect() ? tile : null) : null;
     }
 
     public override void ResolveSpriteVariant(Vector2Int p, WorldGenerator generator)
     {
-        IWorldTile left = DoesCollideOrNull(generator.GetTileAt(new Vector2Int(p.x - 1, p.y)));
-        IWorldTile right = DoesCollideOrNull(generator.GetTileAt(new Vector2Int(p.x + 1, p.y)));
-        IWorldTile up = DoesCollideOrNull(generator.GetTileAt(new Vector2Int(p.x, p.y + 1)));
-        IWorldTile down = DoesCollideOrNull(generator.GetTileAt(new Vector2Int(p.x, p.y - 1)));
-        IWorldTile up_left = DoesCollideOrNull(generator.GetTileAt(new Vector2Int(p.x - 1, p.y + 1)));
-        IWorldTile up_right = DoesCollideOrNull(generator.GetTileAt(new Vector2Int(p.x + 1, p.y + 1)));
-        IWorldTile down_right = DoesCollideOrNull(generator.GetTileAt(new Vector2Int(p.x + 1, p.y - 1)));
-        IWorldTile down_left = DoesCollideOrNull(generator.GetTileAt(new Vector2Int(p.x - 1, p.y - 1)));
+        IWorldTile left = DoesConnectOrNull(generator.GetTileAt(new Vector2Int(p.x - 1, p.y)));
+        IWorldTile right = DoesConnectOrNull(generator.GetTileAt(new Vector2Int(p.x + 1, p.y)));
+        IWorldTile up = DoesConnectOrNull(generator.GetTileAt(new Vector2Int(p.x, p.y + 1)));
+        IWorldTile down = DoesConnectOrNull(generator.GetTileAt(new Vector2Int(p.x, p.y - 1)));
+        IWorldTile up_left = DoesConnectOrNull(generator.GetTileAt(new Vector2Int(p.x - 1, p.y + 1)));
+        IWorldTile up_right = DoesConnectOrNull(generator.GetTileAt(new Vector2Int(p.x + 1, p.y + 1)));
+        IWorldTile down_right = DoesConnectOrNull(generator.GetTileAt(new Vector2Int(p.x + 1, p.y - 1)));
+        IWorldTile down_left = DoesConnectOrNull(generator.GetTileAt(new Vector2Int(p.x - 1, p.y - 1)));
+
+        IWorldTile up_special = generator.GetTileAt(new Vector2Int(p.x, p.y + 1));
+
+        if (left && right && down && up_special)
+        {
+            if (up_special.DoesConnect() && up_special is TabletTile)
+            {
+                SetSprite(SpriteVariant.EdgeBg, 0);
+                return;
+            }
+        }
 
         SetSprite(SpriteVariant.Center, 0);
 
@@ -148,6 +163,9 @@ public class WorldTile : IWorldTile
             SetSprite(SpriteVariant.InnerCorner, 90);
             return;
         }
+
+
+
 
 
     }

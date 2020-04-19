@@ -88,6 +88,7 @@ public class GameManager : MonoBehaviour
         }
         Vector2Int worldSpawn = generatorSpec.GetSpawn();
         player.Teleport(worldSpawn);
+        player.SetAlive(true);
     }
 
     public void onPlayerDied()

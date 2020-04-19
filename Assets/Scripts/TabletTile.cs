@@ -17,7 +17,7 @@ public class TabletTile : IWorldTile
     SpriteRenderer spriteRenderer;
     SpriteVariant spriteType = SpriteVariant.TopLeft;
 
-    public override bool DoesCollide()
+    public override bool DoesConnect()
     {
         return false;
     }

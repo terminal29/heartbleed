@@ -30,7 +30,7 @@ public class LavaTile : IWorldTile
     SpriteRenderer spriteRenderer;
     SpriteVariant spriteType = SpriteVariant.Center;
 
-    public override bool DoesCollide()
+    public override bool DoesConnect()
     {
         return true;
     }

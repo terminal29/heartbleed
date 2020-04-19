@@ -22,7 +22,13 @@ public class PlayerController : MonoBehaviour
     public AudioClip DeathSound;
     public AudioClip RespawnSound;
 
+    public AudioClip bulletShootSound;
+    public AudioClip reloadSound;
+    public AudioClip bulletHitSound;
+
     private GameManager gameManager;
+
+    public BulletController bullet;
 
     private int currentSpriteIndex = 0;
     private System.Random r = new System.Random();
@@ -58,6 +64,11 @@ public class PlayerController : MonoBehaviour
     private CapsuleCollider2D capCollider;
     private AudioSource audioSource;
     Coroutine animator;
+
+    private bool canShoot = true;
+    private float shootCooldownSeconds = 1f;
+    private Vector2 bulletInitialVelocity = new Vector2(10f, 3f);
+    private float bulletRandomSpread = 0.2f;
 
     // Start is called before the first frame update
     void Start()
@@ -100,6 +111,8 @@ public class PlayerController : MonoBehaviour
 
         Move();
 
+        Shoot();
+
         if (isOnGround)
         {
             if (body.velocity.magnitude < 0.1f)
@@ -140,6 +153,33 @@ public class PlayerController : MonoBehaviour
     public void Teleport(Vector2 pos)
     {
         transform.position = pos;
+    }
+
+    public void Shoot()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && canShoot)
+        {
+            canShoot = false;
+            BulletController bulletInstance = Instantiate(bullet);
+            double bulletXVelocity = (bulletInitialVelocity.x + bulletRandomSpread * ((2 * r.NextDouble() - 1) / 2));
+            bulletXVelocity = direction == Direction.Left ? -bulletXVelocity : bulletXVelocity;
+            double bulletYVelocity = (bulletInitialVelocity.y + bulletRandomSpread * ((2 * r.NextDouble() - 1) / 2));
+            bulletInstance.transform.position = transform.position + new Vector3(direction == Direction.Left ? -0.8f : 0.8f, 0.2f, 0);
+            bulletInstance.GetComponent<Rigidbody2D>().velocity = new Vector2((float)bulletXVelocity, (float)bulletYVelocity) + body.velocity;
+            bulletInstance.onBulletHit = () =>
+            {
+                audioSource.PlayOneShot(bulletHitSound);
+            };
+            audioSource.PlayOneShot(bulletShootSound);
+            StartCoroutine(RunShootCooldown());
+        }
+    }
+
+    private IEnumerator RunShootCooldown()
+    {
+        yield return new WaitForSeconds(shootCooldownSeconds);
+        audioSource.PlayOneShot(bulletShootSound);
+        this.canShoot = true;
     }
 
     public void SetAlive(bool alive)
