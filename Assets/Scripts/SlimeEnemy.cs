@@ -92,17 +92,17 @@ public class SlimeEnemy : MonoBehaviour
         circleCollider.enabled = false;
         spriteRenderer.enabled = false;
         isAlive = false;
-        audioSource.PlayOneShot(slimeDie);
-        StartCoroutine(Cleanup());
+        StartCoroutine(Cleanup(transform.position));
     }
 
-    private IEnumerator Cleanup()
+    private IEnumerator Cleanup(Vector3 pos)
     {
+        audioSource.PlayOneShot(slimeDie);
         int coins = (int)(manager.GetLootMultiplier() * Random.Range(1, 3));
         for (int i = 0; i < coins; i++)
         {
-            yield return new WaitForSeconds(0.3f);
-            GameObject coin = Instantiate(manager.GetCoinPrefab(), transform.position, Quaternion.identity);
+            yield return new WaitForSeconds(0.1f);
+            GameObject coin = Instantiate(manager.GetCoinPrefab(), pos, Quaternion.identity);
             coin.GetComponent<Rigidbody2D>().velocity = new Vector2(Random.Range(-3, 3), 3);
         }
         yield return new WaitForSeconds(2);

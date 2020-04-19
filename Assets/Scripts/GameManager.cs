@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Loot")]
     public GameObject coinLoot;
+    public int coins = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -47,6 +48,11 @@ public class GameManager : MonoBehaviour
     public GameObject GetCoinPrefab()
     {
         return coinLoot;
+    }
+
+    public void AddCoins(int coins)
+    {
+        this.coins += coins;
     }
 
 
