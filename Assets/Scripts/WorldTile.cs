@@ -77,15 +77,12 @@ public class WorldTile : IWorldTile
         IWorldTile down_right = DoesConnectOrNull(generator.GetTileAt(new Vector2Int(p.x + 1, p.y - 1)));
         IWorldTile down_left = DoesConnectOrNull(generator.GetTileAt(new Vector2Int(p.x - 1, p.y - 1)));
 
-        IWorldTile up_special = generator.GetTileAt(new Vector2Int(p.x, p.y + 1));
-
-        if (left && right && down && up_special)
+        if (left && right && down && up)
         {
-            if (up_special.DoesConnect() && up_special is TabletTile)
-            {
+            if (up is TabletTile)
                 SetSprite(SpriteVariant.EdgeBg, 0);
-                return;
-            }
+            return;
+
         }
 
         SetSprite(SpriteVariant.Center, 0);

@@ -112,7 +112,7 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
     {
         if (tiles.ContainsKey(position))
         {
-            Destroy(tiles[position]);
+            DestroyImmediate(tiles[position]);
             tiles.Remove(position);
         }
     }

@@ -20,20 +20,21 @@ public class HoleGroundGenerator : IGeneratorSpec
 
     public IWorldTile GenerateTileAt(int seed, Vector2Int position)
     {
+        foreach (CustomGenerator generator in customGenerators)
+        {
+            IWorldTile possibleTile = generator(seed, position);
+            if (possibleTile != null)
+                return possibleTile;
+        }
 
         foreach (Rect hole in holes)
         {
             if (hole.Contains(position))
             {
-                foreach (CustomGenerator generator in customGenerators)
-                {
-                    IWorldTile possibleTile = generator(seed, position);
-                    if (possibleTile != null)
-                        return possibleTile;
-                }
                 return null;
             }
         }
+
         return groundTile;
     }
 

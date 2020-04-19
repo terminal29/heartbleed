@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public IWorldTile jumpInstructionTile;
     public GroundGenerator generator;
     private IGeneratorSpec generatorSpec;
+    private GroundGenerator generatorInstance;
 
     [Header("Player Stats")]
     bool playerExists = false;
@@ -59,25 +60,104 @@ public class GameManager : MonoBehaviour
         this.coins += coins;
     }
 
-
-    void CleanRestart()
+    Rect InvertRectY(Rect input)
     {
-        Vector2Int worldSize = generator.GetWorldSize();
+        Vector2Int worldSize = generatorInstance.GetWorldSize();
+        return new Rect(input.x, worldSize.y - input.y - input.height, input.width, input.height);
+    }
+
+    public void Regenerate()
+    {
+        if (generatorInstance)
+        {
+            generatorInstance.Clear();
+            DestroyImmediate(generatorInstance);
+        }
+        generatorInstance = Instantiate(generator);
+
+        Vector2Int worldSize = generatorInstance.GetWorldSize();
 
         generatorSpec = new HoleGroundGenerator(stoneTile, new List<Rect>{
            new Rect(16, worldSize.y-32, 32, 32),
            new Rect(15, worldSize.y-31, 34, 32),
            new Rect(14, worldSize.y-30, 36, 32),
            new Rect(14, worldSize.y-30, 36, 32),
-           new Rect(31, worldSize.y-35, 10, 3)
+           InvertRectY(new Rect(42, 32, 5, 6)),
+           InvertRectY(new Rect(26, 36, 18, 2)),
+           InvertRectY(new Rect(12, 38, 18, 4)),
+           InvertRectY(new Rect(12, 38, 2, 10)),
+           InvertRectY(new Rect(12, 48, 30, 10)),
+           InvertRectY(new Rect(42, 48, 10, 2)),
+           InvertRectY(new Rect(52, 48, 2, 14)),
+           InvertRectY(new Rect(42, 60, 10, 2)),
+           InvertRectY(new Rect(26, 60, 16, 2)),
+           InvertRectY(new Rect(12, 60, 16, 8)),
+           InvertRectY(new Rect(10, 60, 2, 20)),
+           InvertRectY(new Rect(12, 79, 2, 1)),
+           InvertRectY(new Rect(14, 79, 20, 10)),
+           InvertRectY(new Rect(34, 79, 4, 2)),
+           InvertRectY(new Rect(36, 81, 2, 30)),
+           InvertRectY(new Rect(10, 93, worldSize.x-20, 29)),
         }, new Vector2Int(18, worldSize.y - 29), new List<HoleGroundGenerator.CustomGenerator>
         {
             (seed, position) =>
             {
-                if(new Rect(31, worldSize.y-35, 10, 3).Contains(position))
+                Rect[] boulders = new Rect[]
                 {
-                    return lavaTile;
+                    new Rect(14, 40, 2, 2),
+                    new Rect(20, 40, 2, 2),
+                    new Rect(26, 40, 2, 2),
+                    new Rect(12, 50, 2, 8),
+                    new Rect(14, 52, 2, 6),
+                    new Rect(16, 54, 2, 4),
+                    new Rect(18, 56, 2, 2),
+                    new Rect(22, 52, 2, 2),
+                    new Rect(26, 52, 2, 2),
+                    new Rect(30, 52, 2, 2),
+                    new Rect(34, 52, 2, 2),
+                    new Rect(38, 52, 2, 2),
+                    new Rect(42, 52, 2, 2),
+                    new Rect(26, 64, 2, 4),
+                    new Rect(24, 66, 2, 2),
+                    new Rect(20, 67, 2, 1),
+                    new Rect(16, 67, 2, 1),
+                    new Rect(12, 67, 2, 1),
+                    new Rect(14, 82, 2, 7),
+                    new Rect(24, 85, 2, 2),
+                };
+
+                foreach(Rect boulder in boulders)
+                {
+                    if (InvertRectY(boulder).Contains(position))
+                    {
+                        return stoneTile;
+                    }
                 }
+
+                Rect[] lavaSpots = new Rect[]
+                {
+                    new Rect(31, 32, 10, 3),
+                    new Rect(50, 62, 2, 2),
+                    new Rect(46, 62, 2, 2),
+                    new Rect(42, 62, 2, 2),
+                    new Rect(38, 62, 2, 2),
+                    new Rect(34, 62, 2, 2),
+                    new Rect(30, 62, 2, 2),
+                    new Rect(22, 68, 2, 2),
+                    new Rect(18, 68, 2, 2),
+                    new Rect(14, 68, 2, 2),
+                    new Rect(16, 89, 18, 2)
+                };
+
+                foreach(Rect lava in lavaSpots)
+                {
+                    if (InvertRectY(lava).Contains(position))
+                    {
+                        return lavaTile;
+                    }
+                }
+
+
                 if((position.x == 17 || position.x == 18) && (position.y == worldSize.y - 32 || position.y == worldSize.y - 31))
                 {
                     return moveInstructionTile;
@@ -95,8 +175,13 @@ public class GameManager : MonoBehaviour
             }
         });
 
-        generator = Instantiate(generator);
-        generator.Generate(0, generatorSpec);
+        generatorInstance.Generate(0, generatorSpec);
+    }
+
+    void CleanRestart()
+    {
+        Regenerate();
+        AddAesthetics();
         SpawnMonsters();
 
         if (!playerExists)
@@ -163,8 +248,6 @@ public class GameManager : MonoBehaviour
         {
             respawnUI.Hide();
             heart.SetHealth(heart.GetHealth() - 1);
-            Vector2Int worldSpawn = generatorSpec.GetSpawn();
-            player.Teleport(worldSpawn);
             player.Respawn(); // TODO respawn at checkpoint
         }
     }
@@ -175,15 +258,15 @@ public class GameManager : MonoBehaviour
         {
             while (true)
             {
-                int x = Random.Range(0, generator.GetWorldSize().x);
-                int y = Random.Range(0, generator.GetWorldSize().y);
+                int x = Random.Range(0, generatorInstance.GetWorldSize().x);
+                int y = Random.Range(0, generatorInstance.GetWorldSize().y);
 
                 // Dont spawn on top of the player or right next to them
                 if (generatorSpec.GetSpawn().x > x - 5 && generatorSpec.GetSpawn().x < x + 5)
                 {
                     continue;
                 }
-                if (generator.IsValidMonsterSpawn(new Vector2Int(x, y)))
+                if (generatorInstance.IsValidMonsterSpawn(new Vector2Int(x, y)))
                 {
                     SlimeEnemy slime = Instantiate(slimeEnemyPrefab, new Vector2(x, y), Quaternion.identity);
                     slime.SetLightColor(Random.ColorHSV());
@@ -191,6 +274,11 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void AddAesthetics()
+    {
+
     }
 
     public PlayerController GetPlayer()
@@ -205,7 +293,7 @@ public class GameManager : MonoBehaviour
 
     public GroundGenerator GetWorldGenerator()
     {
-        return generator;
+        return generatorInstance;
     }
 
     public IGeneratorSpec GetGeneratorSpec()
@@ -215,6 +303,6 @@ public class GameManager : MonoBehaviour
 
     public float GetLootMultiplier()
     {
-        return 1f;
+        return GetHeart().GetMaxHealth() - GetHeart().GetHealth() + 1;
     }
 }

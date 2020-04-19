@@ -19,7 +19,7 @@ public class TabletTile : IWorldTile
 
     public override bool DoesConnect()
     {
-        return false;
+        return true;
     }
 
     protected void UpdateRenderer()
