@@ -111,6 +111,7 @@ MonoBehaviour:
   slimeJump: {fileID: 8300000, guid: f12dce9c33afb4842b11453458cbda40, type: 3}
   slimeLand: {fileID: 8300000, guid: 83a2d1ae33e70f34f93d63e5f75260eb, type: 3}
   slimeDie: {fileID: 8300000, guid: 2026bcd209e65a548ba0bcdd5c63fc1c, type: 3}
+  slimeLight: {fileID: 2855187687790749534}
   jumpCooldownMultiplier: 1
 --- !u!50 &2855187687738192171
 Rigidbody2D:

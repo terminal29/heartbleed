@@ -80,7 +80,8 @@ public class PlayerController : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         GetComponent<DamageableEntity>().onDamage = (amount) =>
         {
-            Die();
+            if (isAlive)
+                Die();
         };
         SetState(State.Idle, Direction.Left);
     }
@@ -309,6 +310,7 @@ public class PlayerController : MonoBehaviour
 
     public void Respawn()
     {
+        body.velocity = new Vector2(0, 0);
         StartCoroutine(RunRespawnAnimation());
     }
 

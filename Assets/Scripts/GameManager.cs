@@ -28,6 +28,10 @@ public class GameManager : MonoBehaviour
     public GameObject coinLoot;
     public int coins = 0;
 
+    [Header("Enemies")]
+    public SlimeEnemy slimeEnemyPrefab;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -93,6 +97,7 @@ public class GameManager : MonoBehaviour
 
         generator = Instantiate(generator);
         generator.Generate(0, generatorSpec);
+        SpawnMonsters();
 
         if (!playerExists)
         {
@@ -103,6 +108,31 @@ public class GameManager : MonoBehaviour
         Vector2Int worldSpawn = generatorSpec.GetSpawn();
         player.Teleport(worldSpawn);
         player.SetAlive(true);
+    }
+
+
+    private Dictionary<PerkType, bool> enabledPerks = new Dictionary<PerkType, bool>{
+        {PerkType.BigLight, true },
+        {PerkType.QuickReload, false },
+        {PerkType.DoubleFire, true },
+        {PerkType.DirectFire, false }
+        };
+    public enum PerkType
+    {
+        BigLight,
+        QuickReload,
+        DoubleFire,
+        DirectFire
+    }
+
+    public Dictionary<PerkType, bool> GetPerks()
+    {
+        return enabledPerks;
+    }
+
+    public void SetPerkStatus(PerkType type, bool status)
+    {
+        enabledPerks[type] = status;
     }
 
     public void onPlayerDied()
@@ -130,6 +160,30 @@ public class GameManager : MonoBehaviour
             Vector2Int worldSpawn = generatorSpec.GetSpawn();
             player.Teleport(worldSpawn);
             player.Respawn(); // TODO respawn at checkpoint
+        }
+    }
+
+    private void SpawnMonsters()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            while (true)
+            {
+                int x = Random.Range(0, generator.GetWorldSize().x);
+                int y = Random.Range(0, generator.GetWorldSize().y);
+
+                // Dont spawn on top of the player or right next to them
+                if (generatorSpec.GetSpawn().x > x - 5 && generatorSpec.GetSpawn().x < x + 5)
+                {
+                    continue;
+                }
+                if (generator.IsValidMonsterSpawn(new Vector2Int(x, y)))
+                {
+                    SlimeEnemy slime = Instantiate(slimeEnemyPrefab, new Vector2(x, y), Quaternion.identity);
+                    slime.SetLightColor(Random.ColorHSV());
+                    break;
+                }
+            }
         }
     }
 

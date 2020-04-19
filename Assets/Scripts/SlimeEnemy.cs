@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering.Universal;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(CircleCollider2D))]
@@ -24,6 +25,8 @@ public class SlimeEnemy : MonoBehaviour
     public AudioClip slimeLand;
     public AudioClip slimeDie;
 
+    public Light2D slimeLight;
+
     bool isAlive = true;
     bool wasOnGround = true;
     bool waitingJump = false;
@@ -33,8 +36,8 @@ public class SlimeEnemy : MonoBehaviour
 
     public float jumpCooldownMultiplier = 1f;
 
-    private State state;
-    private Direction direction;
+    private State state = State.Jump;
+    private Direction direction = Direction.Right;
 
     public enum State
     {
@@ -49,6 +52,11 @@ public class SlimeEnemy : MonoBehaviour
     }
 
     Coroutine animator;
+
+    public void SetLightColor(Color newColor)
+    {
+        slimeLight.color = newColor;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -106,7 +114,7 @@ public class SlimeEnemy : MonoBehaviour
             coin.GetComponent<Rigidbody2D>().velocity = new Vector2(Random.Range(-3, 3), 3);
         }
         yield return new WaitForSeconds(2);
-        Destroy(this);
+        Destroy(gameObject);
     }
 
     private void SetState(State state, Direction direction)
@@ -199,6 +207,7 @@ public class SlimeEnemy : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        collision.collider.gameObject.GetComponent<DamageableEntity>()?.Damage(1);
+        if (collision.collider.GetComponent<SlimeEnemy>() == null)
+            collision.collider.gameObject.GetComponent<DamageableEntity>()?.Damage(1);
     }
 }

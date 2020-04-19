@@ -21,6 +21,11 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
         Clear();
     }
 
+    public bool IsValidMonsterSpawn(Vector2Int pos)
+    {
+        return GetTileAt(pos) == null && GetTileAt(pos - new Vector2Int(0, 1)) != null;
+    }
+
     public Vector2 GetRealPositionFor(Vector2Int pos)
     {
         return new Vector3(pos.x * tileSize, pos.y * tileSize, 0);
