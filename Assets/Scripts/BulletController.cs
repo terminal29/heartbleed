@@ -16,6 +16,7 @@ public class BulletController : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private Rigidbody2D body;
     public int bulletDamage = 1;
+    public bool isPlayerBullet;
     // Start is called before the first frame update
     void Start()
     {
@@ -32,7 +33,9 @@ public class BulletController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        collision.gameObject.GetComponent<DamageableEntity>()?.Damage(bulletDamage);
+        if (!(collision.gameObject.GetComponent<SpiderEnemy>() && !isPlayerBullet))
+            collision.gameObject.GetComponent<DamageableEntity>()?.Damage(bulletDamage);
+
 
         onBulletHit?.Invoke();
         circleCollider.enabled = false;

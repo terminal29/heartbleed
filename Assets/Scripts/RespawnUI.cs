@@ -138,9 +138,9 @@ public class RespawnUI : MonoBehaviour
     {
         if (manager.GetPerks()[GameManager.PerkType.DirectFire])
             return;
-        if (manager.coins >= 50)
+        if (manager.coins >= 10)
         {
-            manager.coins -= 50;
+            manager.coins -= 10;
             manager.SetPerkStatus(GameManager.PerkType.DirectFire, true);
             directFirePerkUnderline.font = unSelectedFont;
         }
@@ -162,9 +162,9 @@ public class RespawnUI : MonoBehaviour
     {
         if (manager.GetPerks()[GameManager.PerkType.QuickReload])
             return;
-        if (manager.coins >= 40)
+        if (manager.coins >= 8)
         {
-            manager.coins -= 40;
+            manager.coins -= 8;
             manager.SetPerkStatus(GameManager.PerkType.QuickReload, true);
             speedReloadPerkUnderline.font = unSelectedFont;
         }
@@ -186,9 +186,9 @@ public class RespawnUI : MonoBehaviour
     {
         if (manager.GetPerks()[GameManager.PerkType.BigLight])
             return;
-        if (manager.coins >= 10)
+        if (manager.coins >= 2)
         {
-            manager.coins -= 10;
+            manager.coins -= 2;
             manager.SetPerkStatus(GameManager.PerkType.BigLight, true);
             lightPerkUnderline.font = unSelectedFont;
         }
@@ -210,9 +210,9 @@ public class RespawnUI : MonoBehaviour
     {
         if (manager.GetPerks()[GameManager.PerkType.DoubleFire])
             return;
-        if (manager.coins >= 30)
+        if (manager.coins >= 12)
         {
-            manager.coins -= 30;
+            manager.coins -= 12;
             manager.SetPerkStatus(GameManager.PerkType.DoubleFire, true);
             doubleFirePerkUnderline.font = unSelectedFont;
         }
@@ -234,9 +234,9 @@ public class RespawnUI : MonoBehaviour
     {
         if (manager.GetHeart().GetHealth() == manager.GetHeart().GetMaxHealth())
             return;
-        if (manager.coins >= 50)
+        if (manager.coins >= 10)
         {
-            manager.coins -= 50;
+            manager.coins -= 10;
             manager.GetHeart().SetHealth(manager.GetHeart().GetHealth() + 1);
             if (manager.GetHeart().GetHealth() == manager.GetHeart().GetMaxHealth())
                 doubleFirePerkUnderline.font = unSelectedFont;

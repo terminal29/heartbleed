@@ -9,12 +9,10 @@ using UnityEngine.Experimental.Rendering.Universal;
 [RequireComponent(typeof(CapsuleCollider2D))]
 [RequireComponent(typeof(AudioSource))]
 [RequireComponent(typeof(DamageableEntity))]
-public class PlayerController : MonoBehaviour
+public class SpiderEnemy : MonoBehaviour
 {
     public Sprite[] IdleSprites;
     public Sprite[] WalkSprites;
-    public Sprite[] JumpSprites;
-    public Sprite[] FallSprites;
 
     public AudioClip[] StepSounds;
     public AudioClip[] JumpSounds;
@@ -22,17 +20,10 @@ public class PlayerController : MonoBehaviour
 
     public AudioClip BeatSound;
     public AudioClip DeathSound;
-    public AudioClip RespawnSound;
 
-    public AudioClip bulletShootSound;
-    public AudioClip reloadSound;
-    public AudioClip bulletHitSound;
+    public GameManager gameManager;
 
-    public Light2D gunLight;
-
-    private GameManager gameManager;
-
-    public BulletController bullet;
+    private int health = 5;
 
     private System.Random r = new System.Random();
     private bool wasOnGround = true;
@@ -46,8 +37,6 @@ public class PlayerController : MonoBehaviour
     {
         Idle,
         Walk,
-        Jump,
-        Fall
     }
 
     public enum Direction
@@ -69,7 +58,7 @@ public class PlayerController : MonoBehaviour
     private AudioSource audioSource;
     Coroutine animator;
 
-    private bool canShoot = true;
+    private bool canMove = true;
     private float shootCooldownSeconds = 1f;
     private Vector2 bulletInitialVelocity = new Vector2(10f, 3f);
     private float bulletRandomSpread = 0.2f;
@@ -92,10 +81,6 @@ public class PlayerController : MonoBehaviour
     public void setGameManager(GameManager manager)
     {
         gameManager = manager;
-        gameManager.GetHeart().onHeartbeat = () =>
-        {
-            audioSource.PlayOneShot(BeatSound);
-        };
     }
 
     // Update is called once per frame
@@ -103,9 +88,6 @@ public class PlayerController : MonoBehaviour
     {
         if (!isAlive)
             return;
-        shootCooldownSeconds = gameManager.GetPerks()[GameManager.PerkType.QuickReload] ? 0.2f : 1f;
-        gunLight.intensity = gameManager.GetPerks()[GameManager.PerkType.BigLight] ? 5 : 1;
-        gunLight.pointLightOuterRadius = gameManager.GetPerks()[GameManager.PerkType.BigLight] ? 5 : 1;
         bool isOnGround = IsOnGround();
         if (isOnGround && !wasOnGround)
         {
@@ -116,14 +98,11 @@ public class PlayerController : MonoBehaviour
             audioSource.PlayOneShot(JumpSounds[r.Next(0, JumpSounds.Length)]);
         }
 
-        if (Input.GetKeyDown(KeyCode.UpArrow) && isOnGround)
+        if (canMove)
         {
-            Jump();
+            canMove = false;
+            StartCoroutine(RandomMove());
         }
-
-        Move();
-
-        Shoot();
 
         if (isOnGround)
         {
@@ -134,17 +113,6 @@ public class PlayerController : MonoBehaviour
             else
             {
                 SetState(State.Walk, direction);
-            }
-        }
-        else
-        {
-            if (body.velocity.y > 0)
-            {
-                SetState(State.Jump, direction);
-            }
-            else
-            {
-                SetState(State.Fall, direction);
             }
         }
 
@@ -167,67 +135,6 @@ public class PlayerController : MonoBehaviour
         transform.position = pos;
     }
 
-    public void Shoot()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) && canShoot)
-        {
-            canShoot = false;
-            BulletController bulletInstance = Instantiate(bullet);
-            bulletInstance.isPlayerBullet = true;
-            double bulletXVelocity = (bulletInitialVelocity.x + bulletRandomSpread * ((2 * r.NextDouble() - 1) / 2));
-            bulletXVelocity = direction == Direction.Left ? -bulletXVelocity : bulletXVelocity;
-
-            double bulletYVelocity = (bulletInitialVelocity.y + bulletRandomSpread * ((2 * r.NextDouble() - 1) / 2));
-
-            if (gameManager.GetPerks()[GameManager.PerkType.DirectFire])
-            {
-                bulletYVelocity = 0;
-                bulletXVelocity *= 2;
-            }
-
-            bulletInstance.transform.position = transform.position + new Vector3(direction == Direction.Left ? -0.8f : 0.8f, 0.2f, 0);
-            bulletInstance.GetComponent<Rigidbody2D>().velocity = new Vector2((float)bulletXVelocity, (float)bulletYVelocity) + body.velocity;
-            bulletInstance.onBulletHit = () =>
-            {
-                bulletInstance.GetComponent<AudioSource>().PlayOneShot(bulletHitSound);
-            };
-
-            if (gameManager.GetPerks()[GameManager.PerkType.DoubleFire])
-            {
-                bulletInstance = Instantiate(bullet);
-                bulletInstance.isPlayerBullet = true;
-                bulletXVelocity = (bulletInitialVelocity.x + bulletRandomSpread * ((2 * r.NextDouble() - 1) / 2));
-                bulletXVelocity = direction == Direction.Left ? -bulletXVelocity : bulletXVelocity;
-
-                bulletYVelocity = (bulletInitialVelocity.y + bulletRandomSpread * ((2 * r.NextDouble() - 1) / 2));
-
-                if (gameManager.GetPerks()[GameManager.PerkType.DirectFire])
-                {
-                    bulletYVelocity = 0;
-                    bulletXVelocity *= 2;
-                }
-
-                bulletInstance.transform.position = transform.position - new Vector3(direction == Direction.Left ? -0.8f : 0.8f, 0.2f, 0);
-                bulletInstance.GetComponent<Rigidbody2D>().velocity = new Vector2(-(float)bulletXVelocity, (float)bulletYVelocity) + body.velocity;
-                bulletInstance.onBulletHit = () =>
-                {
-                    bulletInstance.GetComponent<AudioSource>().PlayOneShot(bulletHitSound);
-                };
-            }
-
-            audioSource.PlayOneShot(bulletShootSound);
-            StartCoroutine(RunShootCooldown());
-        }
-    }
-
-    private IEnumerator RunShootCooldown()
-    {
-
-        yield return new WaitForSeconds(shootCooldownSeconds);
-        audioSource.PlayOneShot(reloadSound);
-        this.canShoot = true;
-    }
-
     public void SetAlive(bool alive)
     {
         isAlive = alive;
@@ -245,18 +152,14 @@ public class PlayerController : MonoBehaviour
         return ray.collider != null;
     }
 
-    private void Jump()
+    private IEnumerator RandomMove()
     {
-        Vector2 velocity = body.velocity;
-        velocity.y = jumpPower;
-        body.velocity = velocity;
-    }
 
-    private void Move()
-    {
+        yield return new WaitForSeconds(UnityEngine.Random.Range(0.5f, 3f));
         Vector2 velocity = body.velocity;
-        velocity.x = Input.GetAxis("Horizontal") * moveSpeed;
+        velocity.x = UnityEngine.Random.Range(-3f, 3f) * moveSpeed;
         body.velocity = velocity;
+        canMove = true;
     }
 
     private void SetState(State state, Direction direction)
@@ -291,12 +194,6 @@ public class PlayerController : MonoBehaviour
                 break;
             case State.Walk:
                 currentSpriteList = WalkSprites;
-                break;
-            case State.Jump:
-                currentSpriteList = JumpSprites;
-                break;
-            case State.Fall:
-                currentSpriteList = FallSprites;
                 break;
         }
         animator = StartCoroutine(RunFrameAnimation());
@@ -341,29 +238,34 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator RunDeathAnimation()
     {
+        Vector3 pos = transform.position;
         this.body.velocity = new Vector2(0, 0);
         audioSource.PlayOneShot(DeathSound);
-        gameManager.GetHeart().SetHealth(gameManager.GetHeart().GetHealth() - 1);
-        gameManager.onPlayerDied();
-        yield return null;
-    }
+        spriteRenderer.enabled = false;
+        capCollider.enabled = false;
 
-    public void Respawn()
-    {
-        body.velocity = new Vector2(0, 0);
-        StartCoroutine(RunRespawnAnimation());
-    }
-
-    private IEnumerator RunRespawnAnimation()
-    {
-        audioSource.PlayOneShot(RespawnSound);
-        yield return new WaitForSeconds(2.2f);
-        SetAlive(true);
-        SetState(State.Idle, Direction.Left);
+        int coins = (int)(gameManager.GetLootMultiplier() * UnityEngine.Random.Range(10, 15));
+        for (int i = 0; i < coins; i++)
+        {
+            yield return new WaitForSeconds(0.01f);
+            GameObject coin = Instantiate(gameManager.GetCoinPrefab(), pos, Quaternion.identity);
+            coin.GetComponent<Rigidbody2D>().velocity = new Vector2(UnityEngine.Random.Range(-3, 3), 3);
+        }
+        yield return new WaitForSeconds(2);
+        gameManager.OnSpiderKilled();
+        Destroy(gameObject);
     }
 
     public void Damage(int amount)
     {
-        Die();
+        health -= amount;
+        if (health <= 0)
+            Die();
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.GetComponent<PlayerController>())
+            collision.collider.gameObject.GetComponent<DamageableEntity>()?.Damage(1);
     }
 }

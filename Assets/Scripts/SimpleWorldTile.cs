@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SimpleWorldTile : WorldTile
+public class SimpleWorldTile : IWorldTile
 {
     public Sprite
         Default;

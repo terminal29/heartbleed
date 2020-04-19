@@ -10,6 +10,14 @@ public class GameManager : MonoBehaviour
     public IWorldTile lavaTile;
     public IWorldTile moveInstructionTile;
     public IWorldTile jumpInstructionTile;
+    public IWorldTile shootInstructionTile;
+    public IWorldTile blueSwordTile;
+    public IWorldTile swordTile;
+    public IWorldTile copperSwordTile;
+    public IWorldTile glowiesTile;
+    public IWorldTile yellowTorchTile;
+    public IWorldTile blueTorchTile;
+    public IWorldTile pinkTorchTile;
     public GroundGenerator generator;
     private IGeneratorSpec generatorSpec;
     private GroundGenerator generatorInstance;
@@ -24,6 +32,7 @@ public class GameManager : MonoBehaviour
 
     [Header("UI")]
     public RespawnUI respawnUI;
+    public WinUI winUI;
 
     [Header("Loot")]
     public GameObject coinLoot;
@@ -31,11 +40,16 @@ public class GameManager : MonoBehaviour
 
     [Header("Enemies")]
     public SlimeEnemy slimeEnemyPrefab;
+    public DopplerEnemy dopplerEnemyPrefab;
+    public SpiderEnemy spiderEnemyPrefab;
 
 
     // Start is called before the first frame update
     void Start()
     {
+        winUI.onRestartSelected = () => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        winUI.onQuitSelected = () => Application.Quit();
+        winUI.Hide();
         respawnUI.onQuitSelected = () => Application.Quit();
         respawnUI.onRestartSelected = () => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         respawnUI.onDieSelected = () => PlayerDied();
@@ -124,6 +138,8 @@ public class GameManager : MonoBehaviour
                     new Rect(12, 67, 2, 1),
                     new Rect(14, 82, 2, 7),
                     new Rect(24, 85, 2, 2),
+
+                    new Rect(28, 83, 2, 2),
                 };
 
                 foreach(Rect boulder in boulders)
@@ -162,9 +178,13 @@ public class GameManager : MonoBehaviour
                 {
                     return moveInstructionTile;
                 }
-                if((position.x == 22 || position.x == 23) && (position.y == worldSize.y - 32 || position.y == worldSize.y - 31))
+                if((position.x == 21 || position.x == 22) && (position.y == worldSize.y - 32 || position.y == worldSize.y - 31))
                 {
                     return jumpInstructionTile;
+                }
+                if((position.x == 25 || position.x == 26) && (position.y == worldSize.y - 32 || position.y == worldSize.y - 31))
+                {
+                    return shootInstructionTile;
                 }
                 if((position.x >= 29 && position.x <= 30) && (position.y >= (worldSize.y - 32) && position.y <= (worldSize.y - 31)))
                 {
@@ -223,16 +243,16 @@ public class GameManager : MonoBehaviour
 
     public void onPlayerDied()
     {
-        respawnUI.Show();
-    }
-
-    public void PlayerDied()
-    {
         SetPerkStatus(PerkType.BigLight, false);
         SetPerkStatus(PerkType.DirectFire, false);
         SetPerkStatus(PerkType.DoubleFire, false);
         SetPerkStatus(PerkType.QuickReload, false);
 
+        respawnUI.Show();
+    }
+
+    public void PlayerDied()
+    {
         if (heart.GetHealth() > 0)
         {
             respawnUI.Hide();
@@ -254,7 +274,7 @@ public class GameManager : MonoBehaviour
 
     private void SpawnMonsters()
     {
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 7; i++)
         {
             while (true)
             {
@@ -274,10 +294,61 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+
+        for (int i = 0; i < 3; i++)
+        {
+            while (true)
+            {
+                int x = Random.Range(0, generatorInstance.GetWorldSize().x);
+                int y = Random.Range(0, generatorInstance.GetWorldSize().y - 20);
+
+                // Dont spawn on top of the player or right next to them
+                if (generatorSpec.GetSpawn().x > x - 5 && generatorSpec.GetSpawn().x < x + 5)
+                {
+                    continue;
+                }
+                if (generatorInstance.IsValidMonsterSpawn(new Vector2Int(x, y)))
+                {
+                    DopplerEnemy doppler = Instantiate(dopplerEnemyPrefab, new Vector2(x, y), Quaternion.identity);
+                    doppler.gameManager = this;
+                    break;
+                }
+            }
+        }
+        SpiderEnemy spider = Instantiate(spiderEnemyPrefab, new Vector2(31, 146), Quaternion.identity);
+        spider.gameManager = this;
+    }
+
+    private void AddAesthetic(IWorldTile tile, int num)
+    {
+        for (int i = 0; i < num; i++)
+        {
+            while (true)
+            {
+                int x = Random.Range(0, generatorInstance.GetWorldSize().x);
+                int y = Random.Range(0, generatorInstance.GetWorldSize().y);
+
+                // Dont spawn on top of the player or right next to them
+                if (generatorInstance.IsValidMonsterSpawn(new Vector2Int(x, y)))
+                {
+                    generator.SetTileAt(tile, new Vector2Int(x, y));
+                    break;
+                }
+            }
+        }
     }
 
     private void AddAesthetics()
     {
+        AddAesthetic(blueSwordTile, 2);
+        AddAesthetic(swordTile, 2);
+        AddAesthetic(copperSwordTile, 2);
+
+        AddAesthetic(glowiesTile, 4);
+
+        AddAesthetic(yellowTorchTile, 3);
+        AddAesthetic(blueTorchTile, 3);
+        AddAesthetic(pinkTorchTile, 3);
 
     }
 
@@ -304,5 +375,11 @@ public class GameManager : MonoBehaviour
     public float GetLootMultiplier()
     {
         return GetHeart().GetMaxHealth() - GetHeart().GetHealth() + 1;
+    }
+
+    public void OnSpiderKilled()
+    {
+        player.SetAlive(false);
+        winUI.Show();
     }
 }

@@ -346,4 +346,10 @@ public class DopplerEnemy : MonoBehaviour
     {
         Die();
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.GetComponent<PlayerController>())
+            collision.collider.gameObject.GetComponent<DamageableEntity>()?.Damage(1);
+    }
 }

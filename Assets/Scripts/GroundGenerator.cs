@@ -23,7 +23,12 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
 
     public bool IsValidMonsterSpawn(Vector2Int pos)
     {
-        return GetTileAt(pos) == null && GetTileAt(pos - new Vector2Int(0, 1)) != null;
+        return GetTileAt(pos) == null && GetTileAt(pos - new Vector2Int(0, 1)) is WorldTile;
+    }
+
+    public bool IsValidDecorationSpawn(Vector2Int pos)
+    {
+        return GetTileAt(pos) == null && GetTileAt(pos - new Vector2Int(0, 1)) is WorldTile;
     }
 
     public Vector2 GetRealPositionFor(Vector2Int pos)
@@ -89,7 +94,9 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
         if (tiles.ContainsKey(position))
             DestroyTileAt(position);
         if (tile)
+        {
             tiles[position] = Instantiate(tile, GetRealPositionFor(position), Quaternion.identity, transform);
+        }
     }
 
     public Vector2Int GetWorldSize()

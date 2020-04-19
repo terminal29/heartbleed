@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 1707016097755410895}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 6.25, y: 6.25, z: 1}
   m_Children:
   - {fileID: 7580421166338467479}
   m_Father: {fileID: 0}
@@ -95,11 +95,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fdb9dbecac367443b94e3f147acf59c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Center: {fileID: 0}
-  OuterCorner: {fileID: 0}
-  InnerCorner: {fileID: 0}
-  Edge: {fileID: 0}
-  EdgeBg: {fileID: 0}
   Default: {fileID: 21300000, guid: ae0330e0a72a5be4c854c51d12cb1607, type: 3}
 --- !u!1 &6710979374172874869
 GameObject:
@@ -160,7 +155,7 @@ MonoBehaviour:
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0
-  m_PointLightOuterRadius: 0.28086326
+  m_PointLightOuterRadius: 8
   m_PointLightDistance: 3
   m_PointLightQuality: 1
   m_ShapeLightParametricSides: 5
