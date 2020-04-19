@@ -6,7 +6,7 @@ public interface WorldGenerator
     /// Generates the world and stores it in an internal array
     /// </summary>
     /// <param name="seed">World seed</param>
-    void Generate(int seed);
+    void Generate(int seed, IGeneratorSpec generatorSpec);
 
     /// <summary>
     /// Un-Generates
@@ -18,8 +18,6 @@ public interface WorldGenerator
     /// </summary>
     /// <returns></returns>
     Vector2Int GetWorldSize();
-
-    Vector2Int GetSpawnPoint();
 
     /// <summary>
     /// Gets all of the world tiles
@@ -33,7 +31,7 @@ public interface WorldGenerator
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <returns></returns>
-    void GenerateTileAt(Vector2Int position);
+    void GenerateTileAt(Vector2Int position, IGeneratorSpec generatorSpec);
 
     /// <summary>
     /// Destroys & cleans up a tile at that position

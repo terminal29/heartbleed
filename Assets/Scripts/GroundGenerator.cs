@@ -4,15 +4,6 @@ using UnityEngine;
 
 public class GroundGenerator : MonoBehaviour, WorldGenerator
 {
-    public IWorldTile dirt;
-    public IWorldTile stone;
-    public IWorldTile moveStone;
-    public IWorldTile jumpStone;
-    public IWorldTile lava;
-
-    public PlayerController player;
-
-    private IGeneratorSpec generatorSpec;
 
     public float tileSize = 1f;
     const int width = 64;
@@ -23,49 +14,11 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
 
     void Start()
     {
-        player.world = this;
-        generatorSpec = new HoleGroundGenerator(stone, new List<Rect>{
-           new Rect(16, height-32, 32, 32),
-           new Rect(15, height-31, 34, 32),
-           new Rect(14, height-30, 36, 32),
-           new Rect(14, height-30, 36, 32),
-           new Rect(31, height-35, 10, 3)
-        }, new Vector2Int(18, height - 29), new List<HoleGroundGenerator.CustomGenerator>
-        {
-            (seed, position) =>
-            {
-                if(new Rect(31, height-35, 10, 3).Contains(position))
-                {
-                    return lava;
-                }
-                if((position.x == 17 || position.x == 18) && (position.y == height - 32 || position.y == height - 31))
-                {
-                    return moveStone;
-                }
-                if((position.x == 22 || position.x == 23) && (position.y == height - 32 || position.y == height - 31))
-                {
-                    return jumpStone;
-                }
-                if((position.x >= 29 && position.x <= 30) && (position.y >= (height - 32) && position.y <= (height - 31)))
-                {
-                    return stone;
-                }
-
-                return null;
-            }
-        });
-        Generate(0);
-        player.Spawn(generatorSpec.GetSpawn());
     }
 
     private void OnDestroy()
     {
         Clear();
-    }
-
-    public Vector2Int GetSpawnPoint()
-    {
-        return generatorSpec.GetSpawn();
     }
 
     public Vector2 GetRealPositionFor(Vector2Int pos)
@@ -86,7 +39,7 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
         tiles.Clear();
     }
 
-    public void Generate(int seed)
+    public void Generate(int seed, IGeneratorSpec generatorSpec)
     {
         if (hasGenerated)
         {
@@ -99,7 +52,7 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
         {
             for (int x = 0; x < width; x++)
             {
-                GenerateTileAt(new Vector2Int(x, y));
+                GenerateTileAt(new Vector2Int(x, y), generatorSpec);
             }
         }
         hasGenerated = true;
@@ -139,7 +92,7 @@ public class GroundGenerator : MonoBehaviour, WorldGenerator
         return new Vector2Int(width, height);
     }
 
-    public void GenerateTileAt(Vector2Int position)
+    public void GenerateTileAt(Vector2Int position, IGeneratorSpec generatorSpec)
     {
         if (GetTileAt(position))
         {
