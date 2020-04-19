@@ -218,9 +218,9 @@ public class GameManager : MonoBehaviour
 
     public Dictionary<PerkType, bool> enabledPerks = new Dictionary<PerkType, bool>{
         {PerkType.BigLight, false },
-        {PerkType.QuickReload, true },
-        {PerkType.DoubleFire, true },
-        {PerkType.DirectFire, true }
+        {PerkType.QuickReload, false },
+        {PerkType.DoubleFire, false },
+        {PerkType.DirectFire, false }
         };
 
     public enum PerkType
@@ -274,12 +274,12 @@ public class GameManager : MonoBehaviour
 
     private void SpawnMonsters()
     {
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 12; i++)
         {
             while (true)
             {
                 int x = Random.Range(0, generatorInstance.GetWorldSize().x);
-                int y = Random.Range(0, generatorInstance.GetWorldSize().y);
+                int y = Random.Range(0, generatorInstance.GetWorldSize().y - 34);
 
                 // Dont spawn on top of the player or right next to them
                 if (generatorSpec.GetSpawn().x > x - 5 && generatorSpec.GetSpawn().x < x + 5)
@@ -295,12 +295,12 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 6; i++)
         {
             while (true)
             {
                 int x = Random.Range(0, generatorInstance.GetWorldSize().x);
-                int y = Random.Range(0, generatorInstance.GetWorldSize().y - 20);
+                int y = Random.Range(0, generatorInstance.GetWorldSize().y - 34);
 
                 // Dont spawn on top of the player or right next to them
                 if (generatorSpec.GetSpawn().x > x - 5 && generatorSpec.GetSpawn().x < x + 5)
