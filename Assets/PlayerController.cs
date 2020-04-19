@@ -267,21 +267,20 @@ public class PlayerController : MonoBehaviour
         this.body.velocity = new Vector2(0, 0);
         audioSource.PlayOneShot(DeathSound);
         gameManager.GetHeart().SetHealth(gameManager.GetHeart().GetHealth() - 1);
-        yield return new WaitForSeconds(3f);
-        yield return RunRespawnAnimation();
-        gameManager.PlayerDied();
+        gameManager.onPlayerDied();
+        yield return null;
     }
 
     public void Respawn()
     {
-        SetAlive(true);
-        SetState(State.Idle, Direction.Left);
+        StartCoroutine(RunRespawnAnimation());
     }
 
     private IEnumerator RunRespawnAnimation()
     {
         audioSource.PlayOneShot(RespawnSound);
         yield return new WaitForSeconds(2.2f);
-        gameManager.PlayerRespawned();
+        SetAlive(true);
+        SetState(State.Idle, Direction.Left);
     }
 }

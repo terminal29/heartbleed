@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -20,9 +21,17 @@ public class GameManager : MonoBehaviour
     [Header("Camera")]
     public CameraController cameraController;
 
+    [Header("UI")]
+    public RespawnUI respawnUI;
+
     // Start is called before the first frame update
     void Start()
     {
+        respawnUI.onQuitSelected = () => Application.Quit();
+        respawnUI.onRestartSelected = () => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        respawnUI.onDieSelected = () => PlayerDied();
+        respawnUI.onRespawnSelected = () => PlayerRespawned();
+        respawnUI.Hide();
         CleanRestart();
     }
 
@@ -81,10 +90,16 @@ public class GameManager : MonoBehaviour
         player.Teleport(worldSpawn);
     }
 
+    public void onPlayerDied()
+    {
+        respawnUI.Show();
+    }
+
     public void PlayerDied()
     {
         if (heart.GetHealth() > 0)
         {
+            respawnUI.Hide();
             Vector2Int worldSpawn = generatorSpec.GetSpawn();
             player.Teleport(worldSpawn);
             player.Respawn();
@@ -93,7 +108,14 @@ public class GameManager : MonoBehaviour
 
     public void PlayerRespawned()
     {
-        player.SetAlive(true);
+        if (heart.GetHealth() > 1)
+        {
+            respawnUI.Hide();
+            heart.SetHealth(heart.GetHealth() - 1);
+            Vector2Int worldSpawn = generatorSpec.GetSpawn();
+            player.Teleport(worldSpawn);
+            player.Respawn(); // TODO respawn at checkpoint
+        }
     }
 
     public PlayerController GetPlayer()
