@@ -147,6 +147,7 @@ public class GameManager : MonoBehaviour
         SetPerkStatus(PerkType.DirectFire, false);
         SetPerkStatus(PerkType.DoubleFire, false);
         SetPerkStatus(PerkType.QuickReload, false);
+
         if (heart.GetHealth() > 0)
         {
             respawnUI.Hide();

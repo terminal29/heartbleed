@@ -7,6 +7,9 @@ using System;
 public class RespawnUI : MonoBehaviour
 {
 
+    public Font selectedFont;
+    public Font unSelectedFont;
+
     public Image pointerLeft;
     public Image pointerRight;
 
@@ -22,7 +25,19 @@ public class RespawnUI : MonoBehaviour
     public Text restartText;
     public Action onRestartSelected;
 
-    private int selectedIndex = 0;
+    public Text lightPerkUnderline;
+
+    public Text speedReloadPerkUnderline;
+
+    public Text doubleFirePerkUnderline;
+
+    public Text directFirePerkUnderline;
+
+    public Text extraHeartUnderlineText;
+
+
+    GameManager manager;
+
 
     public void Show()
     {
@@ -36,57 +51,198 @@ public class RespawnUI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        manager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
-    Text getElementForIndex(int index)
+    public void RestartPressed()
     {
-        if (index == 0)
-            return respawnText;
-        if (index == 1)
-            return dieText;
-        if (index == 2)
-            return restartText;
-        if (index == 3)
-            return quitText;
-        return null;
+        onRestartSelected?.Invoke();
     }
 
-    Action getActionForIndex(int index)
+    public void RestartHovered(bool isHovered)
     {
-        if (index == 0)
-            return onRespawnSelected;
-        if (index == 1)
-            return onDieSelected;
-        if (index == 2)
-            return onRestartSelected;
-        if (index == 3)
-            return onQuitSelected;
-        return null;
+        if (isHovered)
+        {
+            restartText.font = selectedFont;
+        }
+        else
+        {
+            restartText.font = unSelectedFont;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void DiePressed()
     {
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            selectedIndex = selectedIndex == 0 ? 0 : selectedIndex - 1;
-        }
-        if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            selectedIndex = selectedIndex == 3 ? 3 : selectedIndex + 1;
-        }
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            getActionForIndex(selectedIndex)?.Invoke();
-        }
-
-        Vector3 leftPos = pointerLeft.rectTransform.localPosition;
-        leftPos.y = Mathf.Lerp(leftPos.y, getElementForIndex(selectedIndex).rectTransform.localPosition.y, Time.deltaTime * 10);
-        pointerLeft.rectTransform.localPosition = leftPos;
-
-        Vector3 rightPos = pointerRight.rectTransform.localPosition;
-        rightPos.y = Mathf.Lerp(rightPos.y, getElementForIndex(selectedIndex).rectTransform.localPosition.y, Time.deltaTime * 10);
-        pointerRight.rectTransform.localPosition = rightPos;
+        onDieSelected?.Invoke();
     }
+
+    public void DieHovered(bool isHovered)
+    {
+        if (isHovered)
+        {
+            dieText.font = selectedFont;
+        }
+        else
+        {
+            dieText.font = unSelectedFont;
+        }
+    }
+
+    public void RespawnPressed()
+    {
+        onRespawnSelected?.Invoke();
+    }
+
+    public void RespawnHovered(bool isHovered)
+    {
+        if (isHovered)
+        {
+            respawnText.font = selectedFont;
+        }
+        else
+        {
+            respawnText.font = unSelectedFont;
+        }
+    }
+
+    public void QuitPressed()
+    {
+        onQuitSelected?.Invoke();
+    }
+
+    public void QuitHovered(bool isHovered)
+    {
+        if (isHovered)
+        {
+            quitText.font = selectedFont;
+        }
+        else
+        {
+            quitText.font = unSelectedFont;
+        }
+    }
+
+    public void DirectFireHovered(bool isHovered)
+    {
+        if (isHovered)
+        {
+            if (!manager.GetPerks()[GameManager.PerkType.DirectFire]) directFirePerkUnderline.font = selectedFont;
+        }
+        else
+        {
+            directFirePerkUnderline.font = unSelectedFont;
+        }
+    }
+
+    public void DirectFirePressed()
+    {
+        if (manager.GetPerks()[GameManager.PerkType.DirectFire])
+            return;
+        if (manager.coins >= 50)
+        {
+            manager.coins -= 50;
+            manager.SetPerkStatus(GameManager.PerkType.DirectFire, true);
+            directFirePerkUnderline.font = unSelectedFont;
+        }
+    }
+
+    public void SpeedReloadHovered(bool isHovered)
+    {
+        if (isHovered)
+        {
+            if (!manager.GetPerks()[GameManager.PerkType.QuickReload]) speedReloadPerkUnderline.font = selectedFont;
+        }
+        else
+        {
+            speedReloadPerkUnderline.font = unSelectedFont;
+        }
+    }
+
+    public void SpeedReloadPressed()
+    {
+        if (manager.GetPerks()[GameManager.PerkType.QuickReload])
+            return;
+        if (manager.coins >= 40)
+        {
+            manager.coins -= 40;
+            manager.SetPerkStatus(GameManager.PerkType.QuickReload, true);
+            speedReloadPerkUnderline.font = unSelectedFont;
+        }
+    }
+
+    public void BigLightHovered(bool isHovered)
+    {
+        if (isHovered)
+        {
+            if (!manager.GetPerks()[GameManager.PerkType.BigLight]) lightPerkUnderline.font = selectedFont;
+        }
+        else
+        {
+            lightPerkUnderline.font = unSelectedFont;
+        }
+    }
+
+    public void BigLightPressed()
+    {
+        if (manager.GetPerks()[GameManager.PerkType.BigLight])
+            return;
+        if (manager.coins >= 10)
+        {
+            manager.coins -= 10;
+            manager.SetPerkStatus(GameManager.PerkType.BigLight, true);
+            lightPerkUnderline.font = unSelectedFont;
+        }
+    }
+
+    public void DoubleFireHovered(bool isHovered)
+    {
+        if (isHovered)
+        {
+            if (!manager.GetPerks()[GameManager.PerkType.DoubleFire]) doubleFirePerkUnderline.font = selectedFont;
+        }
+        else
+        {
+            doubleFirePerkUnderline.font = unSelectedFont;
+        }
+    }
+
+    public void DoubleFirePressed()
+    {
+        if (manager.GetPerks()[GameManager.PerkType.DoubleFire])
+            return;
+        if (manager.coins >= 30)
+        {
+            manager.coins -= 30;
+            manager.SetPerkStatus(GameManager.PerkType.DoubleFire, true);
+            doubleFirePerkUnderline.font = unSelectedFont;
+        }
+    }
+
+    public void ExtraHeartHovered(bool isHovered)
+    {
+        if (isHovered)
+        {
+            if (manager.GetHeart().GetHealth() != manager.GetHeart().GetMaxHealth()) extraHeartUnderlineText.font = selectedFont;
+        }
+        else
+        {
+            extraHeartUnderlineText.font = unSelectedFont;
+        }
+    }
+
+    public void ExtraHeartPressed()
+    {
+        if (manager.GetHeart().GetHealth() == manager.GetHeart().GetMaxHealth())
+            return;
+        if (manager.coins >= 50)
+        {
+            manager.coins -= 50;
+            manager.GetHeart().SetHealth(manager.GetHeart().GetHealth() + 1);
+            if (manager.GetHeart().GetHealth() == manager.GetHeart().GetMaxHealth())
+                doubleFirePerkUnderline.font = unSelectedFont;
+        }
+    }
+
+
+
 }
